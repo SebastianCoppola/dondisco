@@ -163,6 +163,58 @@ python -m uvicorn main:app --reload
 La API estará disponible en: `http://localhost:8000`
 Documentación automática: `http://localhost:8000/docs`
 
+---
+
+### **📝 Preparar para Deploy (IMPORTANTE)**
+
+Antes de hacer tu primer deploy o commit al repositorio, asegúrate de:
+
+#### **1. Generar embeddings localmente:**
+```bash
+cd backend
+python scripts/generate_embeddings_optimized.py
+```
+
+Esto generará:
+- `embeddings.npy` (~400MB)
+- `mappings.json` (~5MB)
+
+#### **2. Configurar Git LFS (Large File Storage):**
+
+Git tiene un límite de 100MB por archivo. Como `embeddings.npy` pesa ~400MB, necesitas Git LFS:
+
+```bash
+# Instalar Git LFS (solo primera vez)
+# Windows: Descarga desde https://git-lfs.github.com/
+# O con Chocolatey: choco install git-lfs
+# Linux: sudo apt-get install git-lfs
+# Mac: brew install git-lfs
+
+# Inicializar Git LFS en tu repositorio
+git lfs install
+
+# Trackear archivos grandes
+git lfs track "backend/embeddings.npy"
+git lfs track "*.npy"
+
+# Agregar .gitattributes al repositorio
+git add .gitattributes
+```
+
+#### **3. Commitear y subir embeddings:**
+```bash
+# Agregar los embeddings generados
+git add backend/embeddings.npy backend/mappings.json
+
+# Commit
+git commit -m "Add pre-generated embeddings with Git LFS"
+
+# Push (subirá a GitHub con LFS)
+git push origin master
+```
+
+> 💡 **Nota**: GitHub LFS es gratuito hasta 1GB de almacenamiento y 1GB de ancho de banda por mes. Tu archivo de ~400MB entra perfectamente.
+
 ### Frontend
 
 1. **Instalar dependencias**:
@@ -189,6 +241,190 @@ La aplicación estará disponible en: `http://localhost:3000`
 ---
 
 > 📝 **Nota sobre Deploy**: Este proyecto está optimizado para ejecución local debido al tamaño de los embeddings (~4GB). Los archivos `embeddings.npy` y `mappings.json` no se suben a GitHub y deben generarse localmente.
+
+---
+
+#### **PASO 1: Deploy del Backend en Railway**
+
+1. **Asegúrate de tener los embeddings en GitHub**
+   
+   Primero, genera los embeddings localmente si no los tienes:
+   ```bash
+   cd backend
+   python scripts/generate_embeddings_optimized.py
+   ```
+
+   Luego configura Git LFS y súbelos:
+   ```bash
+   # Instalar Git LFS
+   git lfs install
+   
+   # Trackear archivos grandes
+   git lfs track "backend/embeddings.npy"
+   git lfs track "*.npy"
+   
+   # Agregar y commitear
+   git add .gitattributes
+   git add backend/embeddings.npy backend/mappings.json
+   git commit -m "Add pre-generated embeddings with Git LFS"
+   git push origin master
+   ```
+
+2. **Ve a [Railway](https://railway.app)** y crea una cuenta con GitHub
+
+3. **Crea un nuevo proyecto**:
+   - Click en "New Project" → "Deploy from GitHub repo"
+   - Selecciona tu repositorio `dondisco`
+   - Railway detectará automáticamente el proyecto
+
+4. **Configurar el servicio Backend**:
+   - Click en el servicio creado
+   - Ve a **"Settings"**:
+     - **Root Directory**: `backend`
+     - **Build Command**: `pip install -r requirements.txt`
+     - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+
+5. **Configurar Variables de Entorno**:
+   - Ve a la pestaña **"Variables"**
+   - Agrega:
+     - `PYTHON_VERSION`: `3.13.0`
+     - `ALLOWED_ORIGINS`: `*` (lo actualizarás después con la URL de Vercel)
+
+6. **Generar dominio público**:
+   - Ve a **"Settings"** → **"Networking"**
+   - Click en **"Generate Domain"**
+   - Copia la URL: `https://tu-proyecto.up.railway.app`
+
+7. **Verificar el deploy**:
+   - Espera ~5-10 minutos (solo instala dependencias, NO genera embeddings)
+   - Prueba: `https://tu-proyecto.up.railway.app/health`
+   - Deberías ver: `{"status": "ok", "total_artists": 101375}`
+
+> 💡 **Ventajas de Railway**: 1GB RAM (vs 512MB de Render), embeddings pre-generados (imagen más pequeña), $5 gratis/mes suficiente para desarrollo.
+
+#### **PASO 2: Deploy del Frontend en Vercel**
+
+1. **Ve a [Vercel](https://vercel.com)** y crea una cuenta
+
+2. **Importa tu proyecto**:
+   - Click en "Add New..." → "Project"
+   - Importa tu repositorio de GitHub
+   - Configuración:
+     - **Framework Preset**: `Vite`
+     - **Root Directory**: `frontend`
+     - **Build Command**: `npm run build`
+     - **Output Directory**: `dist`
+
+3. **Configurar Variables de Entorno**:
+   - `VITE_API_URL`: `https://dondisco-backend.onrender.com` (tu URL de Render)
+   - `VITE_LASTFM_API_KEY`: `tu_api_key_de_lastfm` (opcional)
+
+4. **Deploy**: Click en "Deploy"
+   - Espera ~2-5 minutos
+   - Tu app estará en: `https://tu-proyecto.vercel.app`
+
+5. **Actualiza el CORS en Render**:
+   - Vuelve a Render
+   - Ve a Environment Variables
+   - Actualiza `ALLOWED_ORIGINS` con tu URL de Vercel: `https://tu-proyecto.vercel.app`
+   - Redeploy el backend
+
+#### **PASO 3: Verificar el Deploy**
+
+1. Abre tu frontend: `https://tu-proyecto.vercel.app`
+2. Prueba buscar artistas y obtener recomendaciones
+3. Verifica que no haya errores de CORS en la consola del navegador
+
+---
+
+### **🚂 Opción 2: Railway (Full-Stack en un solo lugar)**
+
+#### **Deploy en Railway**
+
+1. **Ve a [Railway](https://railway.app)** y crea una cuenta
+
+2. **Crear nuevo proyecto**:
+   - Click en "New Project"
+   - Selecciona "Deploy from GitHub repo"
+   - Conecta tu repositorio
+
+3. **Configurar Backend**:
+   - Click en "Add Service" → "GitHub Repo"
+   - Selecciona el repositorio
+   - Settings:
+     - **Root Directory**: `/backend`
+     - **Build Command**: `pip install -r requirements.txt && python scripts/generate_embeddings_optimized.py`
+     - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+   - Variables de entorno:
+     - `ALLOWED_ORIGINS`: `*` (o tu dominio frontend)
+     - `PYTHON_VERSION`: `3.13.0`
+
+4. **Configurar Frontend**:
+   - Click en "Add Service" → "GitHub Repo" (mismo repo)
+   - Settings:
+     - **Root Directory**: `/frontend`
+     - **Build Command**: `npm install && npm run build`
+     - **Start Command**: `npm run preview`
+   - Variables de entorno:
+     - `VITE_API_URL`: URL del backend de Railway
+     - `VITE_LASTFM_API_KEY`: tu API key
+
+5. **Railway generará URLs públicas** para ambos servicios
+
+---
+
+### **🐳 Opción 3: Docker + VPS (DigitalOcean, AWS, etc.)**
+
+Para esta opción necesitarías:
+- Dockerfiles (puedo crearlos si quieres)
+- Un servidor VPS
+- Configuración de Nginx/reverse proxy
+- Certificados SSL (Let's Encrypt)
+
+¿Te interesa esta opción avanzada?
+
+---
+
+### **⚠️ Consideraciones Importantes para Producción**
+
+#### **1. Tamaño de Embeddings**
+El archivo `embeddings.npy` pesa ~400MB:
+- **Render Free**: 512MB límite (ajustado)
+- **Railway**: 1GB límite (suficiente)
+- **Alternativa**: Usar almacenamiento externo (AWS S3, Google Cloud Storage)
+
+#### **2. Performance**
+- El backend puede tardar ~10-30 segundos en cargar embeddings al inicio
+- Considera usar servicios "Always On" para evitar cold starts
+- Render y Railway free tier tienen sleep después de 15 min de inactividad
+
+#### **3. CORS**
+- Siempre configura dominios específicos en producción
+- No uses `ALLOWED_ORIGINS=*` en producción real
+
+#### **4. Last.fm API Key**
+- Obtén tu propia API key: https://www.last.fm/api/account/create
+- No compartas la key públicamente
+
+#### **5. Monitoreo**
+- Render y Railway ofrecen logs en tiempo real
+- Configura alertas para errores
+
+---
+
+### **🔄 Actualizar Deploy**
+
+Ambos servicios tienen **CI/CD automático**:
+- Cada `git push` a `main` triggerea un nuevo deploy automáticamente
+- Los cambios se reflejan en ~2-10 minutos
+
+```bash
+git add .
+git commit -m "Actualizar funcionalidad"
+git push origin main
+```
+
+---
 
 ## 📁 Estructura del Proyecto
 
