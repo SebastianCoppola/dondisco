@@ -119,19 +119,63 @@ El sistema demuestra **inteligencia especializada** en el dominio musical:
 
 > **Conclusión**: DonDisco es un **Sistema de IA Aplicada** que utiliza ML como herramienta, pero cuyo valor real está en la **inteligencia emergente** para descubrir y recomendar música de manera autónoma.
 
-## 🚀 Instalación y Configuración
+## 🤖 Cómo Usar la IA de Recomendaciones
 
-### Requisitos Previos
+### **Flujo de Inteligencia Artificial:**
+
+1. **🎯 Entrada Inteligente**:
+   - Busca artistas usando autocompletado inteligente (Last.fm API)
+   - Selecciona hasta 3 artistas para crear tu "perfil musical"
+   - La IA analiza automáticamente los patrones de tus selecciones
+
+2. **🧠 Procesamiento IA**:
+   - El sistema mapea tus artistas a un espacio vectorial de 10K+ dimensiones
+   - Aplica algoritmos de similarity learning para encontrar patrones ocultos
+   - Evalúa 101K+ artistas automáticamente para encontrar coincidencias
+
+3. **⚡ Decisiones Inteligentes**:
+   - La IA rankea automáticamente todas las opciones disponibles
+   - Selecciona las 8 mejores recomendaciones basándose en similitud vectorial
+   - Presenta resultados ordenados por relevancia calculada
+
+4. **🎵 Descubrimiento Musical**:
+   - Explora artistas que tal vez nunca habrías encontrado manualmente
+   - Descubre patrones musicales complejos entre géneros y estilos
+   - Obtén recomendaciones personalizadas sin necesidad de crear perfil
+
+### **Características de IA en Acción:**
+
+- **🌍 Multiidioma**: IA que se adapta al idioma preferido (ES/EN)
+- **🌙 Temas Inteligentes**: Interfaz que se ajusta automáticamente al contexto
+- **⚡ Tiempo Real**: Respuestas instantáneas ~0.1 segundos
+- **🎯 Sin Sesgos**: Recomendaciones basadas en datos objetivos, no popularidad
+- **🔍 Descubrimiento**: Encuentra artistas similares que podrían estar "ocultos"
+
+### **Ejemplo de Uso:**
+```
+Input: [Pink Floyd, Led Zeppelin, The Beatles]
+IA Procesa: 101,375 artistas × 10,111 características
+Output: [King Crimson, Yes, Genesis, Rush, Deep Purple, ...]
+Tiempo: ~0.1 segundos
+Precisión: Basada en similaridad vectorial matemática
+```
+
+
+# 🚀 Instalación y Configuración
+
+DonDisco es una aplicación de estudio y pruebas, que no está desplegada actualmente en servidores. La única forma de correrla es local. A continuación, los pasos para poder hacerlo. 
+
+## 📌 Requisitos Previos
 - Python 3.13+
 - Node.js 16+
 - 8GB RAM recomendado
 
-### Backend
+## 📌 Intalar Backend
 
 1. **Crear entorno virtual**:
 ```bash
 cd backend
-python -m venv venv
+python -m venv .venv
 ```
 
 2. **Activar entorno virtual**:
@@ -163,12 +207,12 @@ python -m uvicorn main:app --reload
 La API estará disponible en: `http://localhost:8000`
 Documentación automática: `http://localhost:8000/docs`
 
-### Frontend
+## 📌 Instalar Frontend
 
 1. **Instalar dependencias**:
 ```bash
 cd frontend
-npm install
+npm install --ignore-scripts
 ```
 
 2. **Configurar Last.fm API** (opcional):
@@ -248,94 +292,9 @@ Verifica el estado de la API.
 }
 ```
 
-## ⚡ Optimizaciones de Rendimiento
+# 🏁 Conclusiones
 
-### Carga de Datos
-- **Embeddings precomputados**: Normalizaciones L2 calculadas offline
-- **Formato eficiente**: NumPy binario (.npy) vs JSON
-- **Precisión optimizada**: Float32 reduce 50% el uso de memoria
-
-### Algoritmo de Recomendación
-- **Vectorización completa**: NumPy elimina loops de Python
-- **Similitud coseno optimizada**: Producto punto con vectores normalizados
-- **Cálculo paralelo**: Una operación matricial vs 101K operaciones individuales
-
-### Métricas de Rendimiento
-| Métrica | Antes | Después | Mejora |
-|---------|-------|---------|--------|
-| Tiempo de carga | ~60s | ~2s | **30x más rápido** |
-| Tiempo de respuesta | ~30s | ~0.1s | **300x más rápido** |
-| Uso de memoria | ~8GB | ~4GB | **50% menos RAM** |
-
-## 🔧 Configuración Avanzada
-
-### Variables de Entorno (Opcional)
-```bash
-# Backend
-EMBEDDINGS_PATH=embeddings_normalized.npy
-MAPPINGS_PATH=mappings.json
-API_HOST=0.0.0.0
-API_PORT=8000
-
-# Frontend
-REACT_APP_API_URL=http://localhost:8000
-REACT_APP_LASTFM_API_KEY=tu_lastfm_api_key_aqui
-```
-
-### Obtener API Key de Last.fm
-1. Crear cuenta en [Last.fm](https://www.last.fm/api/account/create)
-2. Crear una aplicación para obtener tu API key
-3. Agregar la key al archivo `.env.local` del frontend
-
-### CORS
-La API está configurada para aceptar requests desde:
-- `http://localhost:3000` (desarrollo)
-- `http://127.0.0.1:3000` (desarrollo)
-
-Para producción, actualizar las URLs en `main.py`.
-
-## 🤖 Cómo Usar la IA de Recomendaciones
-
-### **Flujo de Inteligencia Artificial:**
-
-1. **🎯 Entrada Inteligente**:
-   - Busca artistas usando autocompletado inteligente (Last.fm API)
-   - Selecciona hasta 3 artistas para crear tu "perfil musical"
-   - La IA analiza automáticamente los patrones de tus selecciones
-
-2. **🧠 Procesamiento IA**:
-   - El sistema mapea tus artistas a un espacio vectorial de 10K+ dimensiones
-   - Aplica algoritmos de similarity learning para encontrar patrones ocultos
-   - Evalúa 101K+ artistas automáticamente para encontrar coincidencias
-
-3. **⚡ Decisiones Inteligentes**:
-   - La IA rankea automáticamente todas las opciones disponibles
-   - Selecciona las 8 mejores recomendaciones basándose en similitud vectorial
-   - Presenta resultados ordenados por relevancia calculada
-
-4. **🎵 Descubrimiento Musical**:
-   - Explora artistas que tal vez nunca habrías encontrado manualmente
-   - Descubre patrones musicales complejos entre géneros y estilos
-   - Obtén recomendaciones personalizadas sin necesidad de crear perfil
-
-### **Características de IA en Acción:**
-
-- **🌍 Multiidioma**: IA que se adapta al idioma preferido (ES/EN)
-- **🌙 Temas Inteligentes**: Interfaz que se ajusta automáticamente al contexto
-- **⚡ Tiempo Real**: Respuestas instantáneas ~0.1 segundos
-- **🎯 Sin Sesgos**: Recomendaciones basadas en datos objetivos, no popularidad
-- **🔍 Descubrimiento**: Encuentra artistas similares que podrían estar "ocultos"
-
-### **Ejemplo de Uso:**
-```
-Input: [Pink Floyd, Led Zeppelin, The Beatles]
-IA Procesa: 101,375 artistas × 10,111 características
-Output: [King Crimson, Yes, Genesis, Rush, Deep Purple, ...]
-Tiempo: ~0.1 segundos
-Precisión: Basada en similaridad vectorial matemática
-```
-
-> **💡 Tip**: La IA funciona mejor con artistas de diferentes subgéneros. ¡Experimenta con combinaciones inesperadas!
+Conslusiones del desarrollo. 
 
 ## 🏆 Logros Técnicos del Sistema de IA
 
@@ -376,16 +335,6 @@ Precisión: Basada en similaridad vectorial matemática
 ## 📄 Licencia
 
 Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
-
-## 🙏 Agradecimientos
-
-- **Dataset**: [Harsh D Prajapati](https://www.kaggle.com/harshdprajapati) por el dataset de Kaggle
-- **Last.fm**: Por proporcionar la API gratuita para búsqueda de artistas
-- **Scikit-learn**: Por las herramientas de Machine Learning
-- **FastAPI**: Por el framework web moderno y rápido
-- **Kaggle**: Por la plataforma de datasets públicos
-
----
 
 ⭐ Si te gusta este proyecto, ¡dale una estrella! ⭐
 

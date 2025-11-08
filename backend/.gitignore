@@ -26,26 +26,10 @@ venv/
 ENV/
 env/
 
-# Environment Variables
-.env
-.env.local
-.env.production
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Project specific
-backend/embeddings.npy
-backend/mappings.json
-backend/scripts/__pycache__/
+# Project specific - Large files
+embeddings.npy
+embeddings_normalized.npy
+mappings.json
 
 # Logs
 *.log
